@@ -55,6 +55,7 @@ fn main() -> Result<()> {
             style::PrintStyledContent(".".yellow())
         )?;
     }
+    draw_circle(center_pos, 20)?;
 
     //move cursor to bottom aswell
     queue!(stdout, cursor::MoveTo(col, row - 1))?;
@@ -63,5 +64,11 @@ fn main() -> Result<()> {
 }
 
 fn draw_circle(center: Center, r: u16) -> Result<()> {
+    let circle_radius_pos = center.center_row + r;
+    queue!(
+        stdout(),
+        cursor::MoveTo(center.center_col + circle_radius_pos, center.center_row),
+        style::PrintStyledContent("x".yellow())
+    )?;
     Ok(())
 }
