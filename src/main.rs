@@ -1,9 +1,21 @@
 use crossterm::{
     cursor, queue,
     style::{self, Stylize},
-    terminal, ExecutableCommand, QueueableCommand, Result,
+    terminal, ExecutableCommand, Result,
 };
 use std::io::{stdout, Write};
+
+#[derive(Debug)]
+struct Points {
+    x: u16,
+    y: u16,
+}
+
+impl Points {
+    fn new(x: u16, y: u16) -> Self {
+        return Self { x, y };
+    }
+}
 
 #[derive(Debug)]
 struct Center {
@@ -57,6 +69,10 @@ fn main() -> Result<()> {
     }
     draw_circle(center_pos, 20)?;
 
+    let from: Points = Points::new(12, 10);
+    let to: Points = Points::new(30, 10);
+    draw_line(from, to)?;
+
     //move cursor to bottom aswell
     queue!(stdout, cursor::MoveTo(col, row - 1))?;
     stdout.flush()?;
@@ -70,5 +86,33 @@ fn draw_circle(center: Center, r: u16) -> Result<()> {
         cursor::MoveTo(center.center_col + circle_radius_pos, center.center_row),
         style::PrintStyledContent("x".yellow())
     )?;
+    Ok(())
+}
+
+fn draw_line(from: Points, to: Points) -> Result<()> {
+    let mut x = from.x;
+    let mut y = from.y;
+
+    let dx: i32 = i32::from(to.x) - i32::from(from.x);
+    let dy: i32 = i32::from(to.y) - i32::from(from.y);
+
+    let mut decision_p: i32 = i32::from(2) * dy - dx;
+
+    while x <= to.x {
+        queue!(
+            stdout(),
+            cursor::MoveTo(x, y),
+            style::PrintStyledContent(".".blue())
+        )?;
+
+        if decision_p < 0 {
+            decision_p = decision_p + 2 * dy
+        } else {
+            decision_p = decision_p + 2 * dy - 2 * dx;
+            y = y + 1;
+        }
+        x = x + 1;
+    }
+
     Ok(())
 }
